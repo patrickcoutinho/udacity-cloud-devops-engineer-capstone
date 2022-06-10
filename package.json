@@ -6,10 +6,11 @@
   "license": "MIT",
   "private": "true",
   "workspaces": [
-    "./backend/*"
+    "./backend/*",
+    "./frontend"
   ],
   "scripts": {
-    "start": "concurrently \"yarn workspace profiles start:dev\" \"yarn workspace users start:dev\" \"yarn workspace api-gateway start:dev\"",
+    "start": "concurrently \"yarn workspace profiles start:dev\" \"yarn workspace users start:dev\" \"yarn workspace api-gateway start:dev\" \"yarn workspace frontend dev\" \"redis-server\"",
     "test": "concurrently \"yarn workspace profiles test\" \"yarn workspace users test\" \"yarn workspace api-gateway test\""
   }
 }
