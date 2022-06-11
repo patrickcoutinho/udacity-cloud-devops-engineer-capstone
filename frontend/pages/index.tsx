@@ -9,9 +9,8 @@ export default function Home() {
   const [accounts, setAccounts] = useState<any[]>([]);
 
   const fetchAccounts = async (): Promise<void> => {
-    await fetch("http://localhost:3000/accounts", {
+    await fetch(`${process.env.NEXT_PUBLIC_API}/accounts`, {
       method: "GET",
-      mode: "cors",
       headers: {
         "Content-Type": "application/json",
       },

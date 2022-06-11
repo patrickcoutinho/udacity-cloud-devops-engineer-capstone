@@ -13,7 +13,7 @@ const Form = () => {
   };
 
   const addAccounts = async (): Promise<void> => {
-    await fetch("http://localhost:3000/accounts", {
+    await fetch(`${process.env.NEXT_PUBLIC_API}/accounts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
