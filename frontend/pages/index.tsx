@@ -1,12 +1,29 @@
 import Head from "next/head";
+import Router from "next/router";
+import { useEffect, useState } from "react";
+import Form from "../components/form/form";
 import Header from "../components/header/header";
-import Main from "../components/main/main";
-
-const content = (
-  <div className="border-4 border-dashed border-gray-200 rounded-lg h-96" />
-);
+import Table from "../components/table/table";
 
 export default function Home() {
+  const [accounts, setAccounts] = useState<any[]>([]);
+
+  const fetchAccounts = async (): Promise<void> => {
+    await fetch("http://localhost:3000/accounts", {
+      method: "GET",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => setAccounts(data));
+  };
+
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
   return (
     <div>
       <Head>
@@ -21,7 +38,29 @@ export default function Home() {
       </header>
 
       <main>
-        <Main title="Accounts" content={content} />
+        <header className="bg-white shadow">
+          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div className="columns-2">
+              <h1 className="text-3xl font-bold text-gray-900">Accounts</h1>
+              <div className="text-right">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline place-self-end"
+                  type="button"
+                  onClick={() => Router.push("/add")}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main>
+          {accounts.length > 0 && (
+            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+              <Table values={accounts} />
+            </div>
+          )}
+        </main>
       </main>
     </div>
   );
