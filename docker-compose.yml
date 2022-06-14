@@ -36,6 +36,15 @@ services:
     ports:
       - 6379:6379
 
+  frontend:
+    build:
+      context: ./frontend/
+    container_name: frontend
+    environment:
+      NEXT_PUBLIC_API: http://localhost:3000
+    ports:
+      - 3001:3001
+
 networks:
   sites-net:
     driver: bridge
