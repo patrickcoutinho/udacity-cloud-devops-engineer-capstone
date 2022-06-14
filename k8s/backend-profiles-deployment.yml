@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: cloud-devops-backend-profiles
+  labels:
+    app: cloud-devops-backend-profiles
+
+spec:
+  selector:
+    matchLabels:
+      app: cloud-devops-backend-profiles
+
+  replicas: 2
+  minReadySeconds: 15
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: cloud-devops-backend-profiles
+    spec:
+      containers:
+        - image: patrickcoutinho/cloud-devops-backend-profiles
+          imagePullPolicy: Always
+          name: cloud-devops-backend-profiles
+          env:
+            - name: REDIS_URL
+              value: "redis://cloud-devops-redis-lb:6379"
