@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "start": "concurrently \"yarn workspace profiles start:dev\" \"yarn workspace users start:dev\" \"yarn workspace api-gateway start:dev\" \"yarn workspace frontend dev\" \"redis-server\"",
-    "test": "concurrently \"yarn workspace profiles test\" \"yarn workspace users test\" \"yarn workspace api-gateway test\""
+    "test": "concurrently \"yarn workspace profiles test\" \"yarn workspace users test\" \"yarn workspace api-gateway test\"",
+    "build:backend": "concurrently \"yarn workspace profiles build\" \"yarn workspace users build\" \"yarn workspace api-gateway build\"",
+    "start-backend:prod": "concurrently \"yarn workspace profiles start:prod\" \"yarn workspace users start:prod\" \"yarn workspace api-gateway start:prod\" \"redis-server\""
   },
   "devDependencies": {
     "semantic-release": "^19.0.3"
