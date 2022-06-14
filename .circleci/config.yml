@@ -95,5 +95,7 @@ workflows:
       - install-project
       - run-tests:
           requires: [install-project]
+          context:
+            - teste
       - run-lint:
           requires: [install-project]
