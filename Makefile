@@ -17,4 +17,4 @@ build-docker-images:
 	./sh/build-docker-images.sh
 
 push-docker-images:
-	@echo to-do
+	./sh/push-docker-images.sh
