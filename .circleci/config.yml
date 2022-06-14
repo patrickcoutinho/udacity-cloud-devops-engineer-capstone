@@ -49,4 +49,5 @@ workflows:
   default:
     jobs:
       - install-project
-      - run-tests
+      - run-tests:
+          requires: [install-project]
