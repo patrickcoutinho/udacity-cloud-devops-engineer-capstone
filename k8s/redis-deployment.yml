@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: cloud-devops-redis
+  labels:
+    app: cloud-devops-redis
+
+spec:
+  selector:
+    matchLabels:
+      app: cloud-devops-redis
+
+  replicas: 1
+  minReadySeconds: 15
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: cloud-devops-redis
+    spec:
+      containers:
+        - image: patrickcoutinho/cloud-devops-redis
+          imagePullPolicy: Always
+          name: cloud-devops-redis
