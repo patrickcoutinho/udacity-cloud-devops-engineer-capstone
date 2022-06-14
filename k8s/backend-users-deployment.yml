@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: cloud-devops-backend-users
+  labels:
+    app: cloud-devops-backend-users
+
+spec:
+  selector:
+    matchLabels:
+      app: cloud-devops-backend-users
+
+  replicas: 2
+  minReadySeconds: 15
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: cloud-devops-backend-users
+    spec:
+      containers:
+        - image: patrickcoutinho/cloud-devops-backend-users
+          imagePullPolicy: Always
+          name: cloud-devops-backend-users
+          env:
+            - name: REDIS_URL
+              value: "redis://cloud-devops-redis-lb:6379"

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: cloud-devops-backend-bff
+  labels:
+    app: cloud-devops-backend-bff
+
+spec:
+  selector:
+    matchLabels:
+      app: cloud-devops-backend-bff
+
+  replicas: 2
+  minReadySeconds: 15
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: cloud-devops-backend-bff
+    spec:
+      containers:
+        - image: patrickcoutinho/cloud-devops-backend-bff
+          imagePullPolicy: Always
+          name: cloud-devops-backend-bff
+          env:
+            - name: REDIS_URL
+              value: "redis://cloud-devops-redis-lb:6379"
