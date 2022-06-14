@@ -25,7 +25,28 @@ jobs:
           paths:
             - node_modules
 
+  run-tests:
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "yarn.lock" }}
+            - v1-deps-
+      - run:
+          name: Install bash, yarn and @nestjs/cli
+          command: |
+            apk add --no-cache bash
+            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
+            yarn global add @nestjs/cli
+      - run:
+          name: Run all tests
+          command: |
+            yarn test
+
 workflows:
   default:
     jobs:
       - install-project
+      - run-tests
