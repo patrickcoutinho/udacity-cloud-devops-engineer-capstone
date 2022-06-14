@@ -16,8 +16,8 @@ const Table = ({ values }) => {
       </thead>
       <tbody className="bg-slate-800">
         {values.length &&
-          values.map((item) => (
-            <tr>
+          values.map((item, key) => (
+            <tr key={key}>
               <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-400">
                 {item.id}
               </td>
