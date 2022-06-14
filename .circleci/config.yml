@@ -71,3 +71,5 @@ workflows:
       - install-project
       - run-tests:
           requires: [install-project]
+      - run-lint:
+          requires: [install-project]
