@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key:
+          keys:
             - v1-deps-{{ checksum "yarn.lock" }}
             - v1-deps-
       - run:
