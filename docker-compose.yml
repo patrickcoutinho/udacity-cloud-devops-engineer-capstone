@@ -4,8 +4,8 @@ services:
   backend-bff:
     build:
       context: ./backend/bff/
-      args:
-        - mode=dev
+      target: "base"
+    command: sh -c "yarn && yarn start:dev"
     container_name: backend-bff
     ports:
       - 3000:3000
@@ -15,8 +15,8 @@ services:
   backend-users:
     build:
       context: ./backend/users/
-      args:
-        - mode=dev
+      target: "base"
+    command: sh -c "yarn && yarn start:dev"
     container_name: backend-users
     environment:
       REDIS_URL: redis://redis:6379
@@ -24,8 +24,8 @@ services:
   backend-profiles:
     build:
       context: ./backend/profiles/
-      args:
-        - mode=dev
+      target: "base"
+    command: sh -c "yarn && yarn start:dev"
     container_name: backend-profiles
     environment:
       REDIS_URL: redis://redis:6379
@@ -39,6 +39,8 @@ services:
   frontend:
     build:
       context: ./frontend/
+      target: "base"
+    command: sh -c "yarn && yarn dev"
     container_name: frontend
     environment:
       NEXT_PUBLIC_API: http://localhost:3000
