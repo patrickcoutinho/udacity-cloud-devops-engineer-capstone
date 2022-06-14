@@ -24,6 +24,10 @@ jobs:
           key: v1-deps-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
+            - backend/bff/node_modules
+            - backend/users/node_modules
+            - backend/profiles/node_modules
+            - frontend/node_modules
 
   run-tests:
     docker:
