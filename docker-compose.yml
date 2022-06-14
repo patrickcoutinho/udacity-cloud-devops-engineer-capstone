@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  backend-bff:
+    build:
+      context: ./backend/bff/
+      args:
+        - mode=dev
+    container_name: backend-bff
+    ports:
+      - 3000:3000
+    environment:
+      REDIS_URL: redis://redis:6379
+
+  backend-users:
+    build:
+      context: ./backend/users/
+      args:
+        - mode=dev
+    container_name: backend-users
+    environment:
+      REDIS_URL: redis://redis:6379
+
+  backend-profiles:
+    build:
+      context: ./backend/profiles/
+      args:
+        - mode=dev
+    container_name: backend-profiles
+    environment:
+      REDIS_URL: redis://redis:6379
+
+  redis:
+    build: ./redis/
+    container_name: redis
+    ports:
+      - 6379:6379
+
+networks:
+  sites-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
