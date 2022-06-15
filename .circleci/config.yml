@@ -123,9 +123,6 @@ jobs:
   build-images:
     docker:
       - image: docker:latest
-        auth:
-          username: patrickcoutinho
-          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:
@@ -140,7 +137,7 @@ jobs:
             export NEW_VERSION=$(git describe --tags --abbrev=0)
             echo NEW_VERSION: $NEW_VERSION
 
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USER --password-stdin
 
             make build-docker-images version=$NEW_VERSION
             make push-docker-images version=$NEW_VERSION
