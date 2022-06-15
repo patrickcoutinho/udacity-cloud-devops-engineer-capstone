@@ -122,23 +122,22 @@ jobs:
 
   build-images:
     docker:
-      - image: node:16-alpine
+      - image: docker:latest
         auth:
           username: patrickcoutinho
           password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:
-          version: 20.10.14
           docker_layer_caching: true
       - run:
-          name: Install bash, curl and make
+          name: Install dependencies
           command: |
-            apk add --no-cache bash curl make
+            apk add --no-cache bash curl make git
       - run:
           name: Build and push Docker images
           command: |
-            export NEW_VERSION=$(npm pkg get version | sed 's/"//g')
+            export NEW_VERSION=$(git describe --tags --abbrev=0)
             echo NEW_VERSION: $NEW_VERSION
 
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
