@@ -130,17 +130,12 @@ jobs:
           command: |
             apk add --no-cache bash curl make docker-cli
       - run:
-          name: Check new app version
+          name: Build and push Docker images
           command: |
             export NEW_VERSION=$(npm pkg get version | sed 's/"//g')
             echo NEW_VERSION: $NEW_VERSION
-      - run:
-          name: Build Docker images
-          command: |
+
             make build-docker-images version=$NEW_VERSION
-      - run:
-          name: Push Docker images
-          command: |
             make push-docker-images version=$NEW_VERSION
       - slack/notify:
           template: basic_fail_1
