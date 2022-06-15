@@ -83,6 +83,10 @@ jobs:
       - image: node:16-alpine
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1.1.0-deps-{{ checksum "yarn.lock" }}
+            - v1.1.0-deps-
       - run:
           name: Install bash, curl, yarn and @nestjs/cli
           command: |
@@ -92,6 +96,52 @@ jobs:
       - slack/notify:
           template: basic_success_1
           event: always
+
+  release:
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1.1.0-deps-{{ checksum "yarn.lock" }}
+            - v1.1.0-deps-
+      - run:
+          name: Install bash, curl, yarn and @nestjs/cli
+          command: |
+            apk add --no-cache bash curl
+            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
+            yarn global add @nestjs/cli
+      - run:
+          name: Update version
+          command: |
+            npx semantic-release
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+
+  check-version:
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1.1.0-deps-{{ checksum "yarn.lock" }}
+            - v1.1.0-deps-
+      - run:
+          name: Install bash, curl, yarn and @nestjs/cli
+          command: |
+            apk add --no-cache bash curl
+            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
+            yarn global add @nestjs/cli
+      - run:
+          name: Check version
+          command: |
+            echo Version $(npm pkg get version | sed 's/"//g')
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
 
 workflows:
   default:
@@ -112,3 +162,17 @@ workflows:
           filters:
             branches:
               ignore: master
+      - release:
+          requires: [run-tests, run-lint]
+          context:
+            - teste
+          filters:
+            branches:
+              only: master
+      - check-version:
+          requires: [release]
+          context:
+            - teste
+          filters:
+            branches:
+              only: master
