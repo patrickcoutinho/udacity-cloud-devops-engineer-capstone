@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 
-repo=patrickcoutinho
-basename=$repo/cloud-devops-
+for ARGUMENT in "$@"
+do
+   KEY=$(echo $ARGUMENT | cut -f1 -d=)
 
-docker build -f ./backend/bff/Dockerfile -t ${basename}backend-bff ./backend/bff
-docker build -f ./backend/profiles/Dockerfile -t ${basename}backend-profiles ./backend/profiles
-docker build -f ./backend/users/Dockerfile -t ${basename}backend-users ./backend/users
-docker build -f ./redis/Dockerfile -t ${basename}redis ./redis
+   KEY_LENGTH=${#KEY}
+   VALUE="${ARGUMENT:$KEY_LENGTH+1}"
+
+   export "$KEY"="$VALUE"
+done
+
+repo=patrickcoutinho
+basename=${repo}/cloud-devops-
+
+docker build -f ./backend/bff/Dockerfile -t ${basename}backend-bff:${version} ./backend/bff
+docker build -f ./backend/profiles/Dockerfile -t ${basename}backend-profiles:${version} ./backend/profiles
+docker build -f ./backend/users/Dockerfile -t ${basename}backend-users:${version} ./backend/users
+docker build -f ./redis/Dockerfile -t ${basename}redis:${version} ./redis

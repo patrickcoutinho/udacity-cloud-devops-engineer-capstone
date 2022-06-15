@@ -14,7 +14,7 @@ lint:
 	@echo to-do
 
 build-docker-images:
-	./sh/build-docker-images.sh
+	./sh/build-docker-images.sh version=$(version)
 
 push-docker-images:
-	./sh/push-docker-images.sh
+	./sh/push-docker-images.sh version=$(version)

@@ -97,7 +97,7 @@ jobs:
           template: basic_success_1
           event: always
 
-  release:
+  update-version:
     docker:
       - image: node:16-alpine
     steps:
@@ -120,31 +120,30 @@ jobs:
           template: basic_fail_1
           event: fail
 
-  check-version:
+  build-images:
     docker:
-      - image: node:16-alpine
+      - image: docker:latest
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1.1.0-deps-{{ checksum "yarn.lock" }}
-            - v1.1.0-deps-
       - run:
-          name: Install bash, curl, yarn and @nestjs/cli
+          name: Check new app version
           command: |
-            apk add --no-cache bash curl
-            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
-            yarn global add @nestjs/cli
+            export NEW_VERSION=$(npm pkg get version | sed 's/"//g')
+            echo NEW_VERSION: $NEW_VERSION
       - run:
-          name: Check version
+          name: Build Docker images
           command: |
-            echo Version $(npm pkg get version | sed 's/"//g')
+            make build-docker-images version=$NEW_VERSION
+      - run:
+          name: Push Docker images
+          command: |
+            make push-docker-images version=$NEW_VERSION
       - slack/notify:
           template: basic_fail_1
           event: fail
 
 workflows:
-  default:
+  integration:
     jobs:
       - install-project
       - run-tests:
@@ -162,17 +161,22 @@ workflows:
           filters:
             branches:
               ignore: master
-      - release:
+      - update-version:
           requires: [run-tests, run-lint]
           context:
             - teste
           filters:
             branches:
               only: master
-      - check-version:
-          requires: [release]
-          context:
-            - teste
+
+  deployment:
+    jobs:
+      - build-images:
           filters:
-            branches:
-              only: master
+            tags:
+              only: /^v.*/
+  #     - release:
+  #         requires: [build-images]
+  #         filters:
+  #           tags:
+  #             only: /^v.*/
