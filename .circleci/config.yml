@@ -176,6 +176,8 @@ workflows:
   deployment:
     jobs:
       - build-images:
+          context:
+            - teste
           filters:
             branches:
               ignore: /.*/
