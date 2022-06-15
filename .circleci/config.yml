@@ -126,6 +126,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install make
+          command: |
+            apk add --no-cache make
+      - run:
           name: Check new app version
           command: |
             export NEW_VERSION=$(npm pkg get version | sed 's/"//g')
