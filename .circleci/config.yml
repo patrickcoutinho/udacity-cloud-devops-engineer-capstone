@@ -173,6 +173,8 @@ workflows:
     jobs:
       - build-images:
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^v.*/
   #     - release:
