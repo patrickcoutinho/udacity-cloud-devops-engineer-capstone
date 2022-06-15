@@ -11,7 +11,7 @@ test:
 	yarn test
 
 lint:
-	@echo to-do
+	yarn lint
 
 build-docker-images:
 	./sh/build-docker-images.sh version=$(version)
