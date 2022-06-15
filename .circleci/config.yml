@@ -122,13 +122,13 @@ jobs:
 
   build-images:
     docker:
-      - image: docker:latest
+      - image: node:16-alpine
     steps:
       - checkout
       - run:
-          name: Install make
+          name: Install bash, curl, make and docker
           command: |
-            apk add --no-cache make
+            apk add --no-cache bash curl make docker-cli
       - run:
           name: Check new app version
           command: |
