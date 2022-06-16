@@ -32,3 +32,13 @@ spec:
           env:
             - name: REDIS_URL
               value: "redis://cloud-devops-redis-lb:6379"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: alpha.eksctl.io/nodegroup-name
+                    operator: In
+                    values:
+                      - nodeg-profiles
