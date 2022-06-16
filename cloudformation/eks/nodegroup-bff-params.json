@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey": "MyNodegroupName",
+        "ParameterValue": "nodeg-bff"
+    },
+    {
+        "ParameterKey": "MyInstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "MyMinSize",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "MyMaxSize",
+        "ParameterValue": "4"
+    }
+]

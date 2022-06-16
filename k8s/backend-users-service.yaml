@@ -2,10 +2,10 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: cloud-devops-backend-users-lb
+  name: cloud-devops-backend-users-svc
 
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 3000
       protocol: TCP
