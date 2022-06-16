@@ -1,5 +1,14 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: "EKS Managed Nodes"
+Parameters:
+  MyNodegroupName:
+    Type: String
+  MyInstanceType:
+    Type: String
+  MyMinSize:
+    Type: Number
+  MyMaxSize:
+    Type: Number
 Mappings:
   ServicePrincipalPartitionMap:
     aws:
@@ -35,25 +44,31 @@ Resources:
           - ResourceType: instance
             Tags:
               - Key: Name
-                Value: cloud-devops-capstone-ng-c42938c9-Node
+                Value: !Sub
+                  - cloud-devops-capstone-ng-${NgName}
+                  - { NgName: !Ref MyNodegroupName }
               - Key: alpha.eksctl.io/nodegroup-name
-                Value: ng-c42938c9
+                Value: !Ref MyNodegroupName
               - Key: alpha.eksctl.io/nodegroup-type
                 Value: managed
           - ResourceType: volume
             Tags:
               - Key: Name
-                Value: cloud-devops-capstone-ng-c42938c9-Node
+                Value: !Sub
+                  - cloud-devops-capstone-ng-${NgName}
+                  - { NgName: !Ref MyNodegroupName }
               - Key: alpha.eksctl.io/nodegroup-name
-                Value: ng-c42938c9
+                Value: !Ref MyNodegroupName
               - Key: alpha.eksctl.io/nodegroup-type
                 Value: managed
           - ResourceType: network-interface
             Tags:
               - Key: Name
-                Value: cloud-devops-capstone-ng-c42938c9-Node
+                Value: !Sub
+                  - cloud-devops-capstone-ng-${NgName}
+                  - { NgName: !Ref MyNodegroupName }
               - Key: alpha.eksctl.io/nodegroup-name
-                Value: ng-c42938c9
+                Value: !Ref MyNodegroupName
               - Key: alpha.eksctl.io/nodegroup-type
                 Value: managed
       LaunchTemplateName: !Sub "${AWS::StackName}"
@@ -63,25 +78,25 @@ Resources:
       AmiType: AL2_x86_64
       ClusterName: cloud-devops-capstone
       InstanceTypes:
-        - t2.micro
+        - !Ref MyInstanceType
       Labels:
         alpha.eksctl.io/cluster-name: cloud-devops-capstone
-        alpha.eksctl.io/nodegroup-name: ng-c42938c9
+        alpha.eksctl.io/nodegroup-name: !Ref MyNodegroupName
       LaunchTemplate:
         Id: !Ref LaunchTemplate
       NodeRole: !GetAtt
         - NodeInstanceRole
         - Arn
-      NodegroupName: ng-c42938c9
+      NodegroupName: !Ref MyNodegroupName
       ScalingConfig:
-        DesiredSize: 2
-        MaxSize: 2
-        MinSize: 2
+        DesiredSize: !Ref MyMinSize
+        MaxSize: !Ref MyMaxSize
+        MinSize: !Ref MyMinSize
       Subnets: !Split
         - ","
         - !ImportValue "CloudDevopsCapstone::SubnetsPublic"
       Tags:
-        alpha.eksctl.io/nodegroup-name: ng-c42938c9
+        alpha.eksctl.io/nodegroup-name: !Ref MyNodegroupName
         alpha.eksctl.io/nodegroup-type: managed
   NodeInstanceRole:
     Type: "AWS::IAM::Role"
