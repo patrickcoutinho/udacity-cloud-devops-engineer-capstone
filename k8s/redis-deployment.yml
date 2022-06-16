@@ -29,3 +29,13 @@ spec:
         - image: patrickcoutinho/cloud-devops-redis
           imagePullPolicy: Always
           name: cloud-devops-redis
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: alpha.eksctl.io/nodegroup-name
+                    operator: In
+                    values:
+                      - nodeg-redis
