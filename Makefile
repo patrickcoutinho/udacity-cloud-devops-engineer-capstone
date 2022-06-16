@@ -21,14 +21,17 @@ push-docker-images:
 
 create-eks-cluster:
 	aws cloudformation deploy \
-		--template-file ./eks/cluster.yml \
+		--template-file ./cloudformation/eks/cluster.yml \
 		--stack-name CloudDevopsCapstone \
 		--region us-east-1 \
-		--capabilities CAPABILITY_IAM --profile
+		--capabilities CAPABILITY_IAM \
+		--profile=udacity
 
 create-eks-nodegoup:
 	aws cloudformation deploy \
-		--template-file ./eks/nodegroup.yml \
-		--stack-name CloudDevopsCapstoneNodeGroup \
+		--template-file ./cloudformation/eks/nodegroup.yml \
+		--stack-name CloudDevopsCapstoneNodeGroup-$(nodeName) \
 		--region us-east-1 \
-		--capabilities CAPABILITY_IAM --profile
+		--capabilities CAPABILITY_IAM \
+		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
+		--profile=udacity
