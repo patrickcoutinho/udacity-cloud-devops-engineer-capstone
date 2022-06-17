@@ -26,7 +26,7 @@ spec:
         app: cloud-devops-backend-users
     spec:
       containers:
-        - image: patrickcoutinho/cloud-devops-backend-users
+        - image: patrickcoutinho/cloud-devops-backend-users:{{NEW_VERSION}}
           imagePullPolicy: Always
           name: cloud-devops-backend-users
           env:
