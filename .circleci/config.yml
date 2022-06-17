@@ -130,12 +130,12 @@ jobs:
 
             kubectl apply -f k8s/backend-users-service.yaml
 
-            template=`cat "k8s/backend-users-deployment.yml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
+            template=`cat "k8s/backend-users-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
             echo "$template" | kubectl apply -f -
 
-            kubectl apply -f k8s/backend-profiles-service.yml
+            kubectl apply -f k8s/backend-profiles-service.yaml
 
-            template=`cat "k8s/backend-profiles-deployment.yml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
+            template=`cat "k8/backend-profiles-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
             echo "$template" | kubectl apply -f -
 
             kubectl apply -f k8s/backend-bff-service.yaml
