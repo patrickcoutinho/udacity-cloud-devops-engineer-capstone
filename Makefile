@@ -35,3 +35,6 @@ create-eks-nodegoup:
 		--capabilities CAPABILITY_IAM \
 		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
 		--profile=udacity
+
+create-k8s-deployment:
+	./sh/create-k8s-deployment.sh
