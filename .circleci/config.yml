@@ -112,6 +112,40 @@ jobs:
           template: basic_fail_1
           event: fail
 
+  create-k8s-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Deploy images to k8s cluster
+          command: |
+            export NEW_VERSION=$(git describe --tags --abbrev=0)
+            echo NEW_VERSION: $NEW_VERSION
+
+            aws eks update-kubeconfig --name cloud-devops-capstone
+
+            kubectl apply -f k8s/backend-users-service.yaml
+
+            template=`cat "k8s/backend-users-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
+            echo "$template" | kubectl apply -f -
+
+            kubectl apply -f k8s/backend-profiles-service.yaml
+
+            template=`cat "k8s/backend-profiles-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
+            echo "$template" | kubectl apply -f -
+
+            kubectl apply -f k8s/backend-bff-service.yaml
+
+            template=`cat "k8s/backend-bff-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
+            echo "$template" | kubectl apply -f -
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+
 workflows:
   integration:
     jobs:
@@ -142,6 +176,15 @@ workflows:
   deployment:
     jobs:
       - build-images:
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - create-k8s-deployment:
+          requires: [build-images]
           context:
             - teste
           filters:
