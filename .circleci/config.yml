@@ -6,19 +6,13 @@ orbs:
 jobs:
   install-project:
     docker:
-      - image: node:16-alpine
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
-      - run:
-          name: Install bash, yarn and @nestjs/cli
-          command: |
-            apk add --no-cache bash
-            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
-            yarn global add @nestjs/cli
       - run:
           name: Install project
           command: |
@@ -34,19 +28,13 @@ jobs:
 
   run-tests:
     docker:
-      - image: node:16-alpine
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
-      - run:
-          name: Install bash, curl, yarn and @nestjs/cli
-          command: |
-            apk add --no-cache bash curl
-            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
-            yarn global add @nestjs/cli
       - run:
           name: Run all tests
           command: |
@@ -57,19 +45,13 @@ jobs:
 
   run-lint:
     docker:
-      - image: node:16-alpine
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
-      - run:
-          name: Install bash, curl, yarn and @nestjs/cli
-          command: |
-            apk add --no-cache bash curl
-            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
-            yarn global add @nestjs/cli
       - run:
           name: Run lint
           command: |
@@ -80,36 +62,26 @@ jobs:
 
   notify-success:
     docker:
-      - image: node:16-alpine
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
-      - run:
-          name: Install bash, curl, yarn and @nestjs/cli
-          command: |
-            apk add --no-cache bash curl
       - slack/notify:
           template: basic_success_1
           event: always
 
   update-version:
     docker:
-      - image: node:16-alpine
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
-      - run:
-          name: Install bash, curl, git, yarn and @nestjs/cli
-          command: |
-            apk add --no-cache bash curl git
-            apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
-            yarn global add @nestjs/cli
       - run:
           name: Update version
           command: |
@@ -120,16 +92,12 @@ jobs:
 
   build-images:
     docker:
-      - image: docker:latest
+      - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.14
           docker_layer_caching: true
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --no-cache bash curl make git
       - run:
           name: Build and push Docker images
           command: |
