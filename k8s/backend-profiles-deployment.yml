@@ -26,7 +26,7 @@ spec:
         app: cloud-devops-backend-profiles
     spec:
       containers:
-        - image: patrickcoutinho/cloud-devops-backend-profiles
+        - image: patrickcoutinho/cloud-devops-backend-profiles:{{NEW_VERSION}}
           imagePullPolicy: Always
           name: cloud-devops-backend-profiles
           env:
