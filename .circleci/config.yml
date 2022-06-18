@@ -85,7 +85,7 @@ jobs:
       - run:
           name: Save old version to file
           command: |
-            echo "$(git describe --tags --abbrev=0)" >> old_version.txt
+            echo "$(git describe --tags --abbrev=0)" > old_version.txt
             echo OLD_VERSION: $(cat old_version.txt)
       - run:
           name: Update version
