@@ -83,18 +83,9 @@ jobs:
             - v1.1.0-deps-{{ checksum "yarn.lock" }}
             - v1.1.0-deps-
       - run:
-          name: Save old version to file
-          command: |
-            echo "$(git describe --tags --abbrev=0)" > old_version.txt
-            echo OLD_VERSION: $(cat old_version.txt)
-      - run:
           name: Update version
           command: |
             npx semantic-release
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/old_version.txt
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -165,8 +156,6 @@ jobs:
       - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
       - run:
           name: Cleanup green service/deployment
           command: |
