@@ -164,6 +164,19 @@ jobs:
           template: basic_fail_1
           event: fail
 
+  cleanup-k8s-green-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - run:
+          name: Deploy images to k8s cluster
+          command: |
+            kubectl delete service cloud-devops-backend-bff-lb-green cloud-devops-backend-profiles-svc-green cloud-devops-backend-users-svc-green
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+
 workflows:
   integration:
     jobs:
@@ -221,6 +234,15 @@ workflows:
               only: /^v.*/
       - update-k8s-blue-deployment:
           requires: [smoke-test-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cleanup-k8s-green-deployment:
+          requires: [update-k8s-blue-deployment]
           context:
             - teste
           filters:
