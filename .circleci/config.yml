@@ -92,9 +92,9 @@ jobs:
           command: |
             npx semantic-release
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - old_version.txt
+            - project/old_version.txt
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -166,9 +166,9 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: .
+          at: ~/
       - run:
-          name: Deploy images to k8s cluster
+          name: Cleanup green service/deployment
           command: |
             make cleanup-k8s-green-deployment
       - slack/notify:
