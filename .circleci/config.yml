@@ -151,7 +151,7 @@ jobs:
             GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-green | grep Ingress | awk '{print $3}')
             echo GREEN_URL: $GREEN_URL
 
-            if curl "http://${GREEN_URL}:3000/accounts" | grep "login"
+            if curl -s "${GREEN_URL}:3000/accounts" | grep "login"
             then
                 return 0
             else
