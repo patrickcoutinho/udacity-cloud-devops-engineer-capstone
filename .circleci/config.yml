@@ -112,30 +112,24 @@ jobs:
           template: basic_fail_1
           event: fail
 
-  create-k8s-deployment:
+  create-k8s-green-deployment:
     docker:
       - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: true
       - run:
           name: Deploy images to k8s cluster
           command: |
-            make create-k8s-deployment
+            make create-k8s-deployment svc_env=green
       - slack/notify:
           template: basic_fail_1
           event: fail
 
-  smoke-test-backend:
+  smoke-test-k8s-green-deployment:
     docker:
       - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: true
       - run:
           name: Perform smoke test
           command: |
@@ -153,6 +147,19 @@ jobs:
             else
                 return 1
             fi
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+
+  update-k8s-blue-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - run:
+          name: Deploy images to k8s cluster
+          command: |
+            make update-k8s-service svc_env=blue
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -194,7 +201,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - create-k8s-deployment:
+      - create-k8s-green-deployment:
           requires: [build-images]
           context:
             - teste
@@ -203,8 +210,17 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - smoke-test-backend:
-          requires: [create-k8s-deployment]
+      - smoke-test-k8s-green-deployment:
+          requires: [create-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - update-k8s-blue-deployment:
+          requires: [smoke-test-k8s-green-deployment]
           context:
             - teste
           filters:
