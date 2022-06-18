@@ -31,7 +31,7 @@ spec:
           name: cloud-devops-backend-users
           env:
             - name: REDIS_URL
-              value: "redis://cloud-devops-redis-lb:6379"
+              value: "redis://cloud-devops-redis-svc:6379"
       affinity:
       affinity:
         nodeAffinity:
