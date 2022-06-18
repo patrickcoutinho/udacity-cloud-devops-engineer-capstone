@@ -128,6 +128,35 @@ jobs:
           template: basic_fail_1
           event: fail
 
+  smoke-test-backend:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Perform smoke test
+          command: |
+            NEW_VERSION=$(git describe --tags --abbrev=0)
+            NEW_VERSION_NAME="${NEW_VERSION//./"-"}"
+
+            kubectl wait deployment -n default cloud-devops-backend-bff-$(NEW_VERSION_NAME) --for condition=Available=True --timeout=90s
+
+            GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-green | grep Ingress | awk '{print $3}')
+            echo GREEN_URL: $GREEN_URL
+
+            if curl "http://${GREEN_URL}:3000/accounts" | grep "login"
+            then
+                return 0
+            else
+                return 1
+            fi
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+
 workflows:
   integration:
     jobs:
@@ -167,6 +196,15 @@ workflows:
               only: /^v.*/
       - create-k8s-deployment:
           requires: [build-images]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - smoke-test-backend:
+          requires: [create-k8s-deployment]
           context:
             - teste
           filters:
