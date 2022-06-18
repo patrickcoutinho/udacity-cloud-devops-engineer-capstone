@@ -47,3 +47,6 @@ update-k8s-service:
 
 smoke-test-k8s-green-deployment:
 	sh -c '. ./sh/smoke-test-k8s-green-deployment.sh svc_env=$(svc_env)'
+
+cleanup-k8s-green-deployment:
+	./sh/cleanup-k8s-green-deployment.sh
