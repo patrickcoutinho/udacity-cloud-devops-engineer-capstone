@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: cloud-devops-backend-bff
+  name: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
   labels:
-    app: cloud-devops-backend-bff
+    app: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
 
 spec:
   selector:
     matchLabels:
-      app: cloud-devops-backend-bff
+      app: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
 
   replicas: 2
   minReadySeconds: 15
@@ -23,15 +23,15 @@ spec:
   template:
     metadata:
       labels:
-        app: cloud-devops-backend-bff
+        app: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
     spec:
       containers:
         - image: patrickcoutinho/cloud-devops-backend-bff:{{NEW_VERSION}}
           imagePullPolicy: Always
-          name: cloud-devops-backend-bff
+          name: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
           env:
             - name: REDIS_URL
-              value: "redis://cloud-devops-redis-lb:6379"
+              value: "redis://cloud-devops-redis-svc:6379"
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

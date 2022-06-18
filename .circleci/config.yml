@@ -112,36 +112,67 @@ jobs:
           template: basic_fail_1
           event: fail
 
-  create-k8s-deployment:
+  create-k8s-green-deployment:
     docker:
       - image: patrickcoutinho/cloud-devops-ci
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: true
       - run:
           name: Deploy images to k8s cluster
           command: |
-            export NEW_VERSION=$(git describe --tags --abbrev=0)
-            echo NEW_VERSION: $NEW_VERSION
+            make create-k8s-deployment svc_env=green
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
 
-            aws eks update-kubeconfig --name cloud-devops-capstone
+  smoke-test-k8s-green-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - run:
+          name: Perform smoke test
+          command: |
+            NEW_VERSION=$(git describe --tags --abbrev=0)
+            NEW_VERSION_NAME="${NEW_VERSION//./"-"}"
 
-            kubectl apply -f k8s/backend-users-service.yaml
+            kubectl wait deployment -n default cloud-devops-backend-bff-$(NEW_VERSION_NAME) --for condition=Available=True --timeout=90s
 
-            template=`cat "k8s/backend-users-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
-            echo "$template" | kubectl apply -f -
+            GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-green | grep Ingress | awk '{print $3}')
+            echo GREEN_URL: $GREEN_URL
 
-            kubectl apply -f k8s/backend-profiles-service.yaml
+            if curl "http://${GREEN_URL}:3000/accounts" | grep "login"
+            then
+                return 0
+            else
+                return 1
+            fi
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
 
-            template=`cat "k8/backend-profiles-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
-            echo "$template" | kubectl apply -f -
+  update-k8s-blue-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - run:
+          name: Deploy images to k8s cluster
+          command: |
+            make update-k8s-service svc_env=blue
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
 
-            kubectl apply -f k8s/backend-bff-service.yaml
-
-            template=`cat "k8s/backend-bff-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g"`
-            echo "$template" | kubectl apply -f -
+  cleanup-k8s-green-deployment:
+    docker:
+      - image: patrickcoutinho/cloud-devops-ci
+    steps:
+      - checkout
+      - run:
+          name: Deploy images to k8s cluster
+          command: |
+            kubectl delete service cloud-devops-backend-bff-lb-green cloud-devops-backend-profiles-svc-green cloud-devops-backend-users-svc-green
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -183,8 +214,35 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - create-k8s-deployment:
+      - create-k8s-green-deployment:
           requires: [build-images]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - smoke-test-k8s-green-deployment:
+          requires: [create-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - update-k8s-blue-deployment:
+          requires: [smoke-test-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cleanup-k8s-green-deployment:
+          requires: [update-k8s-blue-deployment]
           context:
             - teste
           filters:

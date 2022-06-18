@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: cloud-devops-backend-users-svc
+  name: cloud-devops-backend-users-svc-{{SVC_ENV}}
 
 spec:
   type: ClusterIP
@@ -10,4 +10,4 @@ spec:
     - port: 3000
       protocol: TCP
   selector:
-    app: cloud-devops-backend-users
+    app: cloud-devops-backend-users-{{NEW_VERSION_NAME}}
