@@ -25,5 +25,5 @@ echo "$template" | kubectl apply -f -
 template=`cat "k8s/backend-profiles-service.yaml" | sed "s/{{SVC_ENV}}/$SVC_ENV/g" | sed "s/{{NEW_VERSION_NAME}}/$NEW_VERSION_NAME/g"`
 echo "$template" | kubectl apply -f -
 
-template=`cat "k8s/backend-bff-deployment.yaml" | sed "s/{{NEW_VERSION}}/$NEW_VERSION/g" | sed "s/{{NEW_VERSION_NAME}}/$NEW_VERSION_NAME/g"`
+template=`cat "k8s/backend-bff-service.yaml" | sed "s/{{SVC_ENV}}/$SVC_ENV/g" | sed "s/{{NEW_VERSION_NAME}}/$NEW_VERSION_NAME/g"`
 echo "$template" | kubectl apply -f -
