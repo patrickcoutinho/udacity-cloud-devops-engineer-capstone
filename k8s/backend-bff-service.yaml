@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: cloud-devops-backend-bff-lb
+  name: cloud-devops-backend-bff-lb-{{SVC_ENV}}
 
 spec:
   type: LoadBalancer
@@ -11,4 +11,4 @@ spec:
       protocol: TCP
       targetPort: 3000
   selector:
-    app: cloud-devops-backend-bff
+    app: cloud-devops-backend-bff-{{NEW_VERSION_NAME}}
