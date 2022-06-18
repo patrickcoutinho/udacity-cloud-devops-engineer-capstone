@@ -2,7 +2,7 @@
 
 aws eks update-kubeconfig --name cloud-devops-capstone
 
-OLD_VERSION=$(cat old_version.txt)
+OLD_VERSION=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)
 OLD_VERSION_NAME="${OLD_VERSION//./"-"}"
 echo OLD_VERSION_NAME: ${OLD_VERSION_NAME}
 
