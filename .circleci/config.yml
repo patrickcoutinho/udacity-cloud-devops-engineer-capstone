@@ -136,7 +136,7 @@ jobs:
             NEW_VERSION=$(git describe --tags --abbrev=0)
             NEW_VERSION_NAME="${NEW_VERSION//./"-"}"
 
-            kubectl wait deployment -n default cloud-devops-backend-bff-$(NEW_VERSION_NAME) --for condition=Available=True --timeout=90s
+            kubectl wait deployment -n default cloud-devops-backend-bff-$NEW_VERSION_NAME --for condition=Available=True --timeout=90s
 
             GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-green | grep Ingress | awk '{print $3}')
             echo GREEN_URL: $GREEN_URL
