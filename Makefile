@@ -37,9 +37,6 @@ create-eks-nodegoup:
 		--profile=udacity
 
 create-k8s-deployment:
-	./sh/create-k8s-deployment.sh
-
-create-k8s-deployment:
 	./sh/create-k8s-deployment.sh svc_env=$(svc_env)
 
 update-k8s-service:
