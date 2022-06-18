@@ -38,3 +38,9 @@ create-eks-nodegoup:
 
 create-k8s-deployment:
 	./sh/create-k8s-deployment.sh
+
+create-k8s-deployment:
+	./sh/create-k8s-deployment.sh svc_env=$(svc_env)
+
+update-k8s-service:
+	./sh/update-k8s-service.sh svc_env=$(svc_env)
