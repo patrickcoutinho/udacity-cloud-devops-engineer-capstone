@@ -44,3 +44,6 @@ create-k8s-deployment:
 
 update-k8s-service:
 	./sh/update-k8s-service.sh svc_env=$(svc_env)
+
+smoke-test-k8s-green-deployment:
+	sh -c '. ./sh/smoke-test-k8s-green-deployment.sh svc_env=$(svc_env)'
