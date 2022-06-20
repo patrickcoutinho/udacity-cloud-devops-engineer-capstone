@@ -17,6 +17,8 @@ aws eks update-kubeconfig --name cloud-devops-capstone
 
 kubectl wait deployment -n default cloud-devops-backend-bff-${NEW_VERSION_NAME} --for condition=Available=True --timeout=180s
 
+sleep 20
+
 GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-${svc_env} | grep Ingress | awk '{print $3}')
 echo GREEN_URL: "${GREEN_URL}:3000/accounts"
 
