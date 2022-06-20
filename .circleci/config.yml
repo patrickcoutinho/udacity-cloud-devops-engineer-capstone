@@ -3,10 +3,13 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.10.1
 
+defaults: &defaults
+  docker:
+    - image: patrickcoutinho/cloud-devops-ci
+
 jobs:
   install-project:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -27,8 +30,7 @@ jobs:
             - frontend/node_modules
 
   run-tests:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -44,8 +46,7 @@ jobs:
           event: fail
 
   run-lint:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -61,8 +62,7 @@ jobs:
           event: fail
 
   notify-success:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -74,8 +74,7 @@ jobs:
           event: always
 
   update-version:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -91,8 +90,7 @@ jobs:
           event: fail
 
   build-images:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - setup_remote_docker:
@@ -113,8 +111,7 @@ jobs:
           event: fail
 
   create-k8s-green-deployment:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -126,8 +123,7 @@ jobs:
           event: fail
 
   smoke-test-k8s-green-deployment:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -139,8 +135,7 @@ jobs:
           event: fail
 
   update-k8s-blue-deployment:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - run:
@@ -152,8 +147,7 @@ jobs:
           event: fail
 
   cleanup-k8s-green-deployment:
-    docker:
-      - image: patrickcoutinho/cloud-devops-ci
+    <<: *defaults
     steps:
       - checkout
       - run:
