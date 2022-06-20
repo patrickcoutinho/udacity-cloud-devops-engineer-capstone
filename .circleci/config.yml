@@ -1,3 +1,7 @@
+defaults: &defaults
+  docker:
+    - image: patrickcoutinho/cloud-devops-ci
+
 version: 2.1
 
 orbs:
@@ -12,10 +16,6 @@ commands:
           when: on_fail
           command: |
             make destroy-k8s-environment
-
-defaults: &defaults
-  docker:
-    - image: patrickcoutinho/cloud-devops-ci
 
 jobs:
   install-project:
