@@ -15,7 +15,7 @@ NEW_VERSION_NAME="${NEW_VERSION//./"-"}"
 
 aws eks update-kubeconfig --name cloud-devops-capstone
 
-kubectl wait deployment -n default cloud-devops-backend-bff-${NEW_VERSION_NAME} --for condition=Available=True --timeout=90s
+kubectl wait deployment -n default cloud-devops-backend-bff-${NEW_VERSION_NAME} --for condition=Available=True --timeout=180s
 
 GREEN_URL=$(kubectl describe service/cloud-devops-backend-bff-lb-${svc_env} | grep Ingress | awk '{print $3}')
 echo GREEN_URL: "${GREEN_URL}:3000/accounts"
