@@ -22,7 +22,7 @@ echo GREEN_URL: "${GREEN_URL}:3000/accounts"
 
 if curl -s "${GREEN_URL}:3000/accounts" | grep "login"
 then
-    return 1
+    return 0
 else
     return 1
 fi
