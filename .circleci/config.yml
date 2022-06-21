@@ -15,7 +15,7 @@ commands:
           name: Destroy k8s environment on fail
           when: on_fail
           command: |
-            # make destroy-k8s-environment
+            make destroy-k8s-environment
 
 jobs:
   install-project:
