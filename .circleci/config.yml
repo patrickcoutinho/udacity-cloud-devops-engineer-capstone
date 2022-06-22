@@ -206,7 +206,7 @@ jobs:
       - destroy-frontend-environment:
           version: $(git describe --tags --abbrev=0)
 
-  cloudfront-update:
+  update-cloudfront:
     <<: *defaults
     steps:
       - checkout
@@ -337,7 +337,7 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - cloudfront-update:
+      - update-cloudfront:
           requires: [deploy-frontend]
           context:
             - teste
