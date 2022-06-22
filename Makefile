@@ -36,6 +36,14 @@ create-eks-nodegroup:
 		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
 		--profile=udacity
 
+create-frontend-cloudfront:
+	aws cloudformation deploy \
+		--template-file ./cloudformation/frontend/cloudfront.yml \
+		--stack-name CloudDevopsCapstoneFront \
+		--parameter-overrides version="prod" \
+		--region us-east-1 \
+		--profile=udacity
+
 create-k8s-deployment:
 	./sh/create-k8s-deployment.sh svc_env=$(svc_env)
 
