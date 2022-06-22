@@ -13,6 +13,9 @@ test:
 lint:
 	yarn lint
 
+update-version:
+	npx semantic-release
+
 build-docker-images:
 	./sh/build-docker-images.sh version=$(version)
 
@@ -27,13 +30,27 @@ create-eks-cluster:
 		--capabilities CAPABILITY_IAM \
 		--profile=udacity
 
-create-eks-nodegoup:
+create-eks-nodegroup:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/eks/nodegroup.yml \
 		--stack-name CloudDevopsCapstoneNodeGroup-$(nodeName) \
 		--region us-east-1 \
 		--capabilities CAPABILITY_IAM \
 		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
+		--profile=udacity
+
+create-eks-all: create-eks-cluster
+	$(MAKE) create-eks-nodegroup nodeName=redis
+	$(MAKE) create-eks-nodegroup nodeName=users
+	$(MAKE) create-eks-nodegroup nodeName=profiles
+	$(MAKE) create-eks-nodegroup nodeName=bff
+
+create-frontend-cloudfront:
+	aws cloudformation deploy \
+		--template-file ./cloudformation/frontend/cloudfront.yml \
+		--stack-name CloudDevopsCapstoneFront \
+		--parameter-overrides version="prod" \
+		--region us-east-1 \
 		--profile=udacity
 
 create-k8s-deployment:
@@ -50,3 +67,15 @@ cleanup-k8s-deployment:
 
 destroy-k8s-environment:
 	./sh/destroy-k8s-environment.sh
+
+create-frontend-bucket:
+	./sh/create-frontend-bucket.sh
+
+deploy-frontend:
+	./sh/deploy-frontend.sh
+
+update-cloudfront:
+	./sh/update-cloudfront.sh
+
+cleanup-frontend-bucket:
+	./sh/cleanup-frontend-bucket.sh

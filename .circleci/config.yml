@@ -16,6 +16,17 @@ commands:
           when: on_fail
           command: |
             make destroy-k8s-environment
+  destroy-frontend-bucket:
+    description: Destroy frontend cloudformation s3
+    parameters:
+      version:
+        type: string
+    steps:
+      - run:
+          name: Destroy frontend bucket
+          when: on_fail
+          command: |
+            aws s3 rm s3://cloud-devops-capstone-<<parameters.version>> --recursive
 
 jobs:
   install-project:
@@ -29,7 +40,7 @@ jobs:
       - run:
           name: Install project
           command: |
-            yarn
+            make install
       - save_cache:
           key: v1.1.0-deps-{{ checksum "yarn.lock" }}
           paths:
@@ -94,7 +105,7 @@ jobs:
       - run:
           name: Update version
           command: |
-            npx semantic-release
+            make update-version
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -145,6 +156,48 @@ jobs:
           event: fail
       - destroy-k8s-environment
 
+  create-frontend-bucket:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            make create-frontend-bucket
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+      - destroy-k8s-environment
+      - destroy-frontend-bucket:
+          version: $(git describe --tags --abbrev=0)
+
+  deploy-frontend:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Deploy frontend objects
+          command: |
+            make deploy-frontend
+      - destroy-k8s-environment
+      - destroy-frontend-bucket:
+          version: $(git describe --tags --abbrev=0)
+
+  update-cloudfront:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            make update-cloudfront
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+      - destroy-k8s-environment
+      - destroy-frontend-bucket:
+          version: $(git describe --tags --abbrev=0)
+
   update-k8s-blue-deployment:
     <<: *defaults
     steps:
@@ -168,6 +221,15 @@ jobs:
       - slack/notify:
           template: basic_fail_1
           event: fail
+
+  cleanup-frontend-bucket:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Remove old frontend bucket
+          command: |
+            make cleanup-frontend-bucket
 
 workflows:
   integration:
@@ -224,6 +286,33 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
+      - create-frontend-bucket:
+          requires: [smoke-test-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - deploy-frontend:
+          requires: [create-frontend-bucket]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - update-cloudfront:
+          requires: [deploy-frontend]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
       - update-k8s-blue-deployment:
           requires: [smoke-test-k8s-green-deployment]
           context:
@@ -234,6 +323,15 @@ workflows:
             tags:
               only: /^v.*/
       - cleanup-k8s-green-deployment:
+          requires: [update-k8s-blue-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cleanup-frontend-bucket:
           requires: [update-k8s-blue-deployment]
           context:
             - teste

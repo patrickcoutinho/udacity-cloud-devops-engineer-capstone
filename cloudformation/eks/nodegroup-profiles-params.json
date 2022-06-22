@@ -5,7 +5,7 @@
     },
     {
         "ParameterKey": "MyInstanceType",
-        "ParameterValue": "t2.micro"
+        "ParameterValue": "t1.micro"
     },
     {
         "ParameterKey": "MyMinSize",
