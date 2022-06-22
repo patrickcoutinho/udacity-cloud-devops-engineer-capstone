@@ -158,7 +158,7 @@ jobs:
           event: fail
       - destroy-k8s-environment
 
-  deploy-frontend-infra:
+  create-frontend-infra:
     <<: *defaults
     steps:
       - checkout
@@ -177,7 +177,30 @@ jobs:
           template: basic_fail_1
           event: fail
       - destroy-k8s-environment
-      - destroy-frontend-environment
+      - destroy-frontend-environment:
+          version: $(git describe --tags --abbrev=0)
+
+  cloudfront-update:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            export NEW_VERSION=$(git describe --tags --abbrev=0)
+            echo NEW_VERSION: $NEW_VERSION
+
+            aws cloudformation deploy \
+              --template-file ./cloudformation/frontend/cloudfront.yml \
+              --stack-name CloudDevopsCapstoneFront \
+              --parameter-overrides version="$NEW_VERSION" \
+              --tags project=cloud-devops-capstone
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+      - destroy-k8s-environment
+      - destroy-frontend-environment:
+          version: $(git describe --tags --abbrev=0)
 
   update-k8s-blue-deployment:
     <<: *defaults
@@ -258,8 +281,17 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - deploy-frontend-infra:
+      - create-frontend-infra:
           requires: [smoke-test-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cloudfront-update:
+          requires: [create-frontend-infra]
           context:
             - teste
           filters:
