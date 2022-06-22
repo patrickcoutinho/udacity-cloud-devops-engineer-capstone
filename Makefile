@@ -39,6 +39,12 @@ create-eks-nodegroup:
 		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
 		--profile=udacity
 
+create-eks-all: create-eks-cluster
+	$(MAKE) create-eks-nodegroup nodeName=redis
+	$(MAKE) create-eks-nodegroup nodeName=users
+	$(MAKE) create-eks-nodegroup nodeName=profiles
+	$(MAKE) create-eks-nodegroup nodeName=bff
+
 create-frontend-cloudfront:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/frontend/cloudfront.yml \
