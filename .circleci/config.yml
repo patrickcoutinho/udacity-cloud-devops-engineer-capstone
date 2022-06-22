@@ -16,19 +16,17 @@ commands:
           when: on_fail
           command: |
             make destroy-k8s-environment
-  destroy-frontend-environment:
-    description: Destroy front-end cloudformation
+  destroy-frontend-bucket:
+    description: Destroy frontend cloudformation s3
     parameters:
       version:
         type: string
     steps:
       - run:
-          name: Destroy front-end environment
+          name: Destroy frontend bucket
           when: on_fail
           command: |
             aws s3 rm s3://cloud-devops-capstone-<<parameters.version>> --recursive
-            aws cloudformation delete-stack \
-                --stack-name cloud-devops-capstone-<<parameters.version>> \
 
 jobs:
   install-project:
@@ -42,7 +40,7 @@ jobs:
       - run:
           name: Install project
           command: |
-            yarn
+            make install
       - save_cache:
           key: v1.1.0-deps-{{ checksum "yarn.lock" }}
           paths:
@@ -107,7 +105,7 @@ jobs:
       - run:
           name: Update version
           command: |
-            npx semantic-release
+            make update-version
       - slack/notify:
           template: basic_fail_1
           event: fail
@@ -165,19 +163,12 @@ jobs:
       - run:
           name: Ensure front-end infrastructure exist
           command: |
-            export NEW_VERSION=$(git describe --tags --abbrev=0)
-            echo NEW_VERSION: $NEW_VERSION
-
-            aws cloudformation deploy \
-              --template-file ./cloudformation/frontend/s3.yml \
-              --stack-name "cloud-devops-capstone-${NEW_VERSION}" \
-              --tags project=cloud-devops-capstone \
-              --parameter-overrides version="${NEW_VERSION}"
+            make create-frontend-bucket
       - slack/notify:
           template: basic_fail_1
           event: fail
       - destroy-k8s-environment
-      - destroy-frontend-environment:
+      - destroy-frontend-bucket:
           version: $(git describe --tags --abbrev=0)
 
   deploy-frontend:
@@ -185,25 +176,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Get backend url
-          command: |
-            NEXT_PUBLIC_API=$(kubectl describe service/cloud-devops-backend-bff-lb-blue | grep Ingress | awk '{print $3}')
-
-            echo "NEXT_PUBLIC_API=${NEXT_PUBLIC_API}:3000" >> frontend/.env
-
-            echo NEXT_PUBLIC_API: $NEXT_PUBLIC_API
-            cat frontend/.env
-      - run:
           name: Deploy frontend objects
           command: |
-            export NEW_VERSION=$(git describe --tags --abbrev=0)
-            echo NEW_VERSION: $NEW_VERSION
-
-            yarn frontend:export
-
-            aws s3 cp ./frontend/out s3://cloud-devops-capstone-${NEW_VERSION} --recursive
+            make deploy-frontend
       - destroy-k8s-environment
-      - destroy-frontend-environment:
+      - destroy-frontend-bucket:
           version: $(git describe --tags --abbrev=0)
 
   update-cloudfront:
@@ -213,19 +190,12 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
-            export NEW_VERSION=$(git describe --tags --abbrev=0)
-            echo NEW_VERSION: $NEW_VERSION
-
-            aws cloudformation deploy \
-              --template-file ./cloudformation/frontend/cloudfront.yml \
-              --stack-name CloudDevopsCapstoneFront \
-              --parameter-overrides version="$NEW_VERSION" \
-              --tags project=cloud-devops-capstone
+            make update-cloudfront
       - slack/notify:
           template: basic_fail_1
           event: fail
       - destroy-k8s-environment
-      - destroy-frontend-environment:
+      - destroy-frontend-bucket:
           version: $(git describe --tags --abbrev=0)
 
   update-k8s-blue-deployment:
@@ -259,10 +229,7 @@ jobs:
       - run:
           name: Remove old frontend bucket
           command: |
-            OLD_VERSION=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
-            echo OLD_VERSION: ${OLD_VERSION}
-
-            aws s3 rm "s3://cloud-devops-capstone-${OLD_VERSION}" --recursive
+            make cleanup-frontend-bucket
 
 workflows:
   integration:

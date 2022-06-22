@@ -13,6 +13,9 @@ test:
 lint:
 	yarn lint
 
+update-version:
+	npx semantic-release
+
 build-docker-images:
 	./sh/build-docker-images.sh version=$(version)
 
@@ -58,3 +61,15 @@ cleanup-k8s-deployment:
 
 destroy-k8s-environment:
 	./sh/destroy-k8s-environment.sh
+
+create-frontend-bucket:
+	./sh/create-frontend-bucket.sh
+
+deploy-frontend:
+	./sh/deploy-frontend.sh
+
+update-cloudfront:
+	./sh/update-cloudfront.sh
+
+cleanup-frontend-bucket:
+	./sh/cleanup-frontend-bucket.sh
