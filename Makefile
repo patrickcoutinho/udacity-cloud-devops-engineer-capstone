@@ -45,6 +45,13 @@ create-eks-all: create-eks-cluster
 	$(MAKE) create-eks-nodegroup nodeName=profiles
 	$(MAKE) create-eks-nodegroup nodeName=bff
 
+delete-eks-all:
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-redis --region=us-east-1 --profile=udacity
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-users --region=us-east-1 --profile=udacity
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-profiles --region=us-east-1 --profile=udacity
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-bff --region=us-east-1 --profile=udacity
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstone --region=us-east-1 --profile=udacity
+
 create-frontend-cloudfront:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/frontend/cloudfront.yml \
