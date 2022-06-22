@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+aws eks update-kubeconfig --name cloud-devops-capstone
+
 NEXT_PUBLIC_API=$(kubectl describe service/cloud-devops-backend-bff-lb-blue | grep Ingress | awk '{print $3}')
 
 echo "NEXT_PUBLIC_API=${NEXT_PUBLIC_API}:3000" > ./frontend/.env
