@@ -1,6 +1,6 @@
 FROM node:16-alpine
 
-RUN apk add --no-cache bash curl git make tar gzip \
+RUN apk add --no-cache bash curl git make tar gzip openssh \
     && apk add --no-cache yarn --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community"
 
 RUN yarn global add @nestjs/cli
