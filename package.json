@@ -14,7 +14,8 @@
     "test": "concurrently \"yarn workspace profiles test\" \"yarn workspace users test\" \"yarn workspace api-gateway test\"",
     "lint": "concurrently \"yarn workspace profiles lint\" \"yarn workspace users lint\" \"yarn workspace api-gateway lint\" \"yarn workspace frontend lint\"",
     "build:backend": "concurrently \"yarn workspace profiles build\" \"yarn workspace users build\" \"yarn workspace api-gateway build\"",
-    "start-backend:prod": "concurrently \"yarn workspace profiles start:prod\" \"yarn workspace users start:prod\" \"yarn workspace api-gateway start:prod\" \"redis-server\""
+    "start-backend:prod": "concurrently \"yarn workspace profiles start:prod\" \"yarn workspace users start:prod\" \"yarn workspace api-gateway start:prod\" \"redis-server\"",
+    "frontend:export": "yarn && yarn workspace frontend build && yarn workspace frontend export"
   },
   "devDependencies": {
     "@semantic-release/git": "^10.0.1",
