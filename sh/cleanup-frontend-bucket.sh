@@ -5,3 +5,4 @@ OLD_VERSION_NAME="${OLD_VERSION//./"-"}"
 echo OLD_VERSION: ${OLD_VERSION}
 
 aws s3 rm "s3://cloud-devops-capstone-${OLD_VERSION_NAME}" --recursive
+aws cloudformation delete-stack --stack-name "cloud-devops-capstone-${OLD_VERSION_NAME}"
