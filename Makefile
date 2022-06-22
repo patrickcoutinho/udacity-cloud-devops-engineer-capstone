@@ -27,7 +27,7 @@ create-eks-cluster:
 		--capabilities CAPABILITY_IAM \
 		--profile=udacity
 
-create-eks-nodegoup:
+create-eks-nodegroup:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/eks/nodegroup.yml \
 		--stack-name CloudDevopsCapstoneNodeGroup-$(nodeName) \
