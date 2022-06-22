@@ -10,8 +10,9 @@ echo frontend/.env:
 cat ./frontend/.env
 
 NEW_VERSION=$(git describe --tags --abbrev=0)
+NEW_VERSION_NAME="${NEW_VERSION//./"-"}"
 echo NEW_VERSION: $NEW_VERSION
 
 yarn frontend:export
 
-aws s3 cp ./frontend/out s3://cloud-devops-capstone-${NEW_VERSION} --recursive
+aws s3 cp ./frontend/out s3://cloud-devops-capstone-${NEW_VERSION_NAME} --recursive
