@@ -180,6 +180,33 @@ jobs:
       - destroy-frontend-environment:
           version: $(git describe --tags --abbrev=0)
 
+  deploy-frontend:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Get backend url
+          command: |
+            echo \
+              NEXT_PUBLIC_API=$(kubectl describe service/cloud-devops-backend-bff-lb-blue | grep Ingress | awk '{print $3}') \
+              >> frontend/.env
+
+            echo NEXT_PUBLIC_API: $NEXT_PUBLIC_API
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            export NEW_VERSION=$(git describe --tags --abbrev=0)
+            echo NEW_VERSION: $NEW_VERSION
+
+            cd frontend
+            yarn && yarn build && yarn export
+
+            aws s3 cp out s3://cloud-devops-capstone-${NEW_VERSION} --recursive
+      - destroy-k8s-environment
+      - destroy-frontend-environment:
+          version: $(git describe --tags --abbrev=0)
+
   cloudfront-update:
     <<: *defaults
     steps:
@@ -290,8 +317,17 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - cloudfront-update:
+      - deploy-frontend:
           requires: [create-frontend-infra]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cloudfront-update:
+          requires: [deploy-frontend]
           context:
             - teste
           filters:
