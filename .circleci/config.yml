@@ -16,6 +16,19 @@ commands:
           when: on_fail
           command: |
             make destroy-k8s-environment
+  destroy-frontend-environment:
+    description: Destroy front-end cloudformation
+    parameters:
+      version:
+        type: string
+    steps:
+      - run:
+          name: Destroy front-end environment
+          when: on_fail
+          command: |
+            aws s3 rm s3://cloud-devops-capstone-<<parameters.version>> --recursive
+            aws cloudformation delete-stack \
+                --stack-name cloud-devops-capstone-<<parameters.version>> \
 
 jobs:
   install-project:
@@ -145,6 +158,27 @@ jobs:
           event: fail
       - destroy-k8s-environment
 
+  deploy-frontend-infra:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            export NEW_VERSION=$(git describe --tags --abbrev=0)
+            echo NEW_VERSION: $NEW_VERSION
+
+            aws cloudformation deploy \
+              --template-file ./cloudformation/frontend/cloudfront.yml \
+              --stack-name "cloud-devops-capstone-${NEW_VERSION}" \
+              --tags project=cloud-devops-capstone \
+              --parameter-overrides version="${NEW_VERSION}"
+      - slack/notify:
+          template: basic_fail_1
+          event: fail
+      - destroy-k8s-environment
+      - destroy-frontend-environment
+
   update-k8s-blue-deployment:
     <<: *defaults
     steps:
@@ -217,6 +251,15 @@ workflows:
               only: /^v.*/
       - smoke-test-k8s-green-deployment:
           requires: [create-k8s-green-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - deploy-frontend-infra:
+          requires: [smoke-test-k8s-green-deployment]
           context:
             - teste
           filters:
