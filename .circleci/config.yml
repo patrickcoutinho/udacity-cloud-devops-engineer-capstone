@@ -314,7 +314,7 @@ workflows:
             tags:
               only: /^v.*/
       - update-k8s-blue-deployment:
-          requires: [smoke-test-k8s-green-deployment]
+          requires: [smoke-test-k8s-green-deployment, deploy-frontend]
           context:
             - teste
           filters:
