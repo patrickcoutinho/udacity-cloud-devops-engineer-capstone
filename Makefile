@@ -12,6 +12,11 @@ test:
 
 lint:
 	yarn lint
+	hadolint ./frontend/Dockerfile
+	hadolint ./redis/Dockerfile
+	hadolint ./backend/users/Dockerfile
+	hadolint ./backend/profiles/Dockerfile
+	hadolint ./backend/bff/Dockerfile
 
 update-version:
 	npx semantic-release
