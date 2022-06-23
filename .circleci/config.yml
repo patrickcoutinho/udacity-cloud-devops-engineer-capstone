@@ -304,15 +304,6 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - update-cloudfront:
-          requires: [deploy-frontend]
-          context:
-            - teste
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
       - update-k8s-blue-deployment:
           requires: [smoke-test-k8s-green-deployment, deploy-frontend]
           context:
@@ -331,8 +322,17 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - cleanup-frontend-bucket:
+      - update-cloudfront:
           requires: [update-k8s-blue-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cleanup-frontend-bucket:
+          requires: [update-cloudfront]
           context:
             - teste
           filters:
