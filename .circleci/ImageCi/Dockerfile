@@ -13,7 +13,7 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.6/b
 RUN chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl
 
 RUN curl -Lo hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
-RUN cchmod +x ./hadolint && mv ./hadolint /usr/local/bin/hadolint
+RUN chmod +x ./hadolint && mv ./hadolint /usr/local/bin/hadolint
 
 RUN apk add --no-cache docker openrc
 RUN rc-update add docker boot
