@@ -46,6 +46,8 @@ services:
       NEXT_PUBLIC_API: http://localhost:3000
     ports:
       - 3001:3001
+    volumes:
+      - $PWD/frontend:/app
 
 networks:
   sites-net:
