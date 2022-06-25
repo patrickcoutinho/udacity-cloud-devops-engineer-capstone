@@ -1,4 +1,4 @@
-# **Udacity Cloud DevOps Engineer Capstone by Patrick Coutinho**
+# **Udacity Cloud DevOps Engineer Capstone**
 
 This is the final project of the course **Cloud DevOps Engineer**. Created by [Patrick Coutinho](https://www.linkedin.com/in/patrickcoutinho/).
 
@@ -15,6 +15,7 @@ Below we have the description of the tools and technologies used:
 - **Docker:** Projects containing their `Dockerfile` Used `docker-compose` for local development.
 - **CI/CD:** Built on `CircleCI`. Contains pipeline with test steps, lint, build, `Docker` image creation, push of `Docker` images to `Docker Hub`, notifications in `Slack`, deploy `Kubernetes` and `Cloudfront`/`S3`, `make` recipes etc.
 - **Deployment:** Blue/green type is used.
+- **Screenshots**: See `screenshots` folder inside project.
 
 ---
 
