@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Router from "next/router";
 import { useEffect, useState } from "react";
-import Form from "../components/form/form";
 import Header from "../components/header/header";
 import Table from "../components/table/table";
 

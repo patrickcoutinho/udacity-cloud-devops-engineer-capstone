@@ -12,6 +12,11 @@ test:
 
 lint:
 	yarn lint
+	# hadolint ./frontend/Dockerfile
+	# hadolint ./redis/Dockerfile
+	# hadolint ./backend/users/Dockerfile
+	# hadolint ./backend/profiles/Dockerfile
+	# hadolint ./backend/bff/Dockerfile
 
 update-version:
 	npx semantic-release
@@ -26,39 +31,43 @@ create-eks-cluster:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/eks/cluster.yml \
 		--stack-name CloudDevopsCapstone \
-		--region us-east-1 \
-		--capabilities CAPABILITY_IAM \
-		--profile=udacity
+		--capabilities CAPABILITY_IAM
 
 create-eks-nodegroup:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/eks/nodegroup.yml \
 		--stack-name CloudDevopsCapstoneNodeGroup-$(nodeName) \
-		--region us-east-1 \
 		--capabilities CAPABILITY_IAM \
-		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json \
-		--profile=udacity
+		--parameter-overrides file://./cloudformation/eks/nodegroup-$(nodeName)-params.json
 
 create-eks-all: create-eks-cluster
 	$(MAKE) create-eks-nodegroup nodeName=redis
 	$(MAKE) create-eks-nodegroup nodeName=users
 	$(MAKE) create-eks-nodegroup nodeName=profiles
 	$(MAKE) create-eks-nodegroup nodeName=bff
+	kubectl apply -f k8s/redis-service.yaml
+	kubectl apply -f k8s/redis-deployment.yaml
 
 delete-eks-all:
-	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-redis --region=us-east-1 --profile=udacity
-	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-users --region=us-east-1 --profile=udacity
-	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-profiles --region=us-east-1 --profile=udacity
-	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-bff --region=us-east-1 --profile=udacity
-	aws cloudformation delete-stack --stack-name CloudDevopsCapstone --region=us-east-1 --profile=udacity
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-redis
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-users
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-profiles
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstoneNodeGroup-bff
+	aws cloudformation delete-stack --stack-name CloudDevopsCapstone
+
+create-frontend-s3:
+	aws cloudformation deploy \
+		--template-file ./cloudformation/frontend/s3.yml \
+		--stack-name CloudDevopsCapstoneFrontStarterBucket \
+		--parameter-overrides version="starter"
 
 create-frontend-cloudfront:
 	aws cloudformation deploy \
 		--template-file ./cloudformation/frontend/cloudfront.yml \
 		--stack-name CloudDevopsCapstoneFront \
-		--parameter-overrides version="prod" \
-		--region us-east-1 \
-		--profile=udacity
+		--parameter-overrides version="starter"
+
+create-frontend-all: create-frontend-s3 create-frontend-cloudfront
 
 create-k8s-deployment:
 	./sh/create-k8s-deployment.sh svc_env=$(svc_env)

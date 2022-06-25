@@ -86,10 +86,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1.1.0-deps-{{ checksum "yarn.lock" }}
-            - v1.1.0-deps-
       - slack/notify:
           template: basic_success_1
           event: always
@@ -231,6 +227,14 @@ jobs:
           command: |
             make cleanup-frontend-bucket
 
+  notify-release-success:
+    <<: *defaults
+    steps:
+      - checkout
+      - slack/notify:
+          template: basic_success_1
+          event: always
+
 workflows:
   integration:
     jobs:
@@ -304,15 +308,6 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - update-cloudfront:
-          requires: [deploy-frontend]
-          context:
-            - teste
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
       - update-k8s-blue-deployment:
           requires: [smoke-test-k8s-green-deployment, deploy-frontend]
           context:
@@ -331,8 +326,26 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-      - cleanup-frontend-bucket:
+      - update-cloudfront:
           requires: [update-k8s-blue-deployment]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - cleanup-frontend-bucket:
+          requires: [update-cloudfront]
+          context:
+            - teste
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - notify-release-success:
+          requires: [update-cloudfront, update-k8s-blue-deployment]
           context:
             - teste
           filters:
