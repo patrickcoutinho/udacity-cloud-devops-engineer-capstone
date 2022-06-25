@@ -1,4 +1,4 @@
-# **Udacity Cloud DevOps Engineer Capstone by Patrick Coutinho**
+# **Udacity Cloud DevOps Engineer Capstone**
 
 This is the final project of the course **Cloud DevOps Engineer**. Created by [Patrick Coutinho](https://www.linkedin.com/in/patrickcoutinho/).
 
