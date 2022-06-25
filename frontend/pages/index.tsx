@@ -28,7 +28,7 @@ export default function Home() {
         <title>Frontend</title>
         <meta
           name="description"
-          content="Frontend | Udacity Cloud DevOps Engineer Capstone"
+          content="Frontend | Udacity Cloud DevOps Engineer Capstone "
         />
       </Head>
       <header>
