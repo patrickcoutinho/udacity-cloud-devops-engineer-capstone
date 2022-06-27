@@ -2,6 +2,8 @@
 
 This is the final project of the course **Cloud DevOps Engineer**. Created by [Patrick Coutinho](https://www.linkedin.com/in/patrickcoutinho/).
 
+Repository: <https://github.com/patrickcoutinho/udacity-cloud-devops-engineer-capstone>
+
 ---
 
 ## Project Details
